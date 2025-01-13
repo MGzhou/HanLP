@@ -13,10 +13,11 @@ with open(join(this_dir, "hanlp", "version.py")) as fp:
     exec(fp.read(), version)
 
 FASTTEXT = 'fasttext-wheel==0.9.2'
-if sys.version_info >= (3, 10):
-    TENSORFLOW = ['tensorflow>=2.8.0']
-else:
-    TENSORFLOW = ['tensorflow==2.6.0', 'keras==2.6.0', 'protobuf<3.19']
+sys_version_info = sys.version_info
+
+TOKENIZERS = []
+if (sys_version_info.major, sys_version_info.minor) == (3, 6) and sys.platform in {'darwin', 'win32'}:
+    TOKENIZERS = ['tokenizers==0.10.3']
 
 extras_require = {
     'amr': [
@@ -25,7 +26,7 @@ extras_require = {
         'perin-parser>=0.0.12',
     ],
     'fasttext': [FASTTEXT],
-    'tf': [FASTTEXT, *TENSORFLOW]
+    'tf': [FASTTEXT, 'tensorflow>=2.6.0,<2.14']
 }
 extras_require['full'] = list(set(sum(extras_require.values(), [])))
 
@@ -61,12 +62,12 @@ setup(
         'pynvml',
         'toposort==1.5',
         'transformers>=4.1.1',
-        'tokenizers==0.11.6',  # The latest tokenizers==0.12.1 failed to compile on macOS Python3.6
         'sentencepiece>=0.1.91',  # Essential for tokenization_bert_japanese
         'torch>=1.6.0',
-        'hanlp-common>=0.0.19',
+        'hanlp-common>=0.0.22',
         'hanlp-trie>=0.0.4',
         'hanlp-downloader',
+        *TOKENIZERS,
     ],
     extras_require=extras_require,
     python_requires='>=3.6',
